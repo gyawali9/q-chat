@@ -26,7 +26,11 @@ const ChatContainer = ({
     <div className="h-full overflow-scroll relative backdrop-blur-lg">
       {/* header */}
       <div className="flex items-center gap-3 py-3 mx-4 border-b border-stone-500">
-        <img src={assets.profile_martin} alt="" className="w-8 rounded-full" />
+        <img
+          src={assets.profile_martin}
+          alt="profile"
+          className="w-8 rounded-full"
+        />
         <p className="flex-1 text-lg text-white flex items-center gap-2">
           Martin Johnson
           <span className="w-2 h-2 rounded-full bg-green-500"></span>
@@ -34,10 +38,14 @@ const ChatContainer = ({
         <img
           onClick={() => setSelectedUser(null)}
           src={assets.arrow_icon}
-          alt=""
+          alt="user"
           className="md:hidden max-w-7"
         />
-        <img src={assets.help_icon} alt="" className="max-md:hidden max-w-5" />
+        <img
+          src={assets.help_icon}
+          alt="help"
+          className="max-md:hidden max-w-5"
+        />
       </div>
 
       {/* chat area */}
@@ -52,7 +60,7 @@ const ChatContainer = ({
             {msg.image ? (
               <img
                 src={msg.image}
-                alt=""
+                alt="msg"
                 className="max-w-[230px] border border-gray-700 rounded-lg overflow-hidden mb-8"
               />
             ) : (
@@ -73,7 +81,7 @@ const ChatContainer = ({
                     ? assets.avatar_icon
                     : assets.profile_martin
                 }
-                alt=""
+                alt="profile image"
                 className="w-7 rounded-full"
               />
               <p className="text-gray-500">
@@ -98,12 +106,16 @@ const ChatContainer = ({
           <label htmlFor="image">
             <img
               src={assets.gallery_icon}
-              alt=""
+              alt="image"
               className="w-5 mr-2 cursor-pointer"
             />
           </label>
         </div>
-        <img src={assets.send_button} alt="" className="w-7 cursor-pointer" />
+        <img
+          src={assets.send_button}
+          alt="button"
+          className="w-7 cursor-pointer"
+        />
       </div>
     </div>
   ) : (

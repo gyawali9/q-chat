@@ -43,7 +43,7 @@ const ProfilePage = () => {
                   ? URL.createObjectURL(selectedImg)
                   : assets.avatar_icon
               }
-              alt=""
+              alt="profile"
               className={`w-12 h-12 ${selectedImg && "rounded-full"}`}
             />
             upload profile image
@@ -74,7 +74,7 @@ const ProfilePage = () => {
         <img
           className="max-w-44 aspect-square rounded-full mx-10 max-sm:mt-10"
           src={assets.logo_icon}
-          alt=""
+          alt="logo"
         />
       </div>
     </div>

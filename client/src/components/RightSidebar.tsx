@@ -17,7 +17,7 @@ const RightSidebar = ({ selectedUser }: RightSidebarProps) => {
         <div className="pt-16 flex flex-col items-center gap-2 text-xs font-light mx-auto">
           <img
             src={selectedUser.profilePic || assets.avatar_icon}
-            alt=""
+            alt="profile"
             className="w-20 aspect-[1/1] rounded-full"
           />
           <h1 className="px-10 text-xl font-medium mx-auto flex items-center gap-2">
@@ -37,7 +37,7 @@ const RightSidebar = ({ selectedUser }: RightSidebarProps) => {
                 className="cursor-pointer rounded"
               >
                 {/* h-full */}
-                <img src={url} alt="" className="rounded-md" />
+                <img src={url} alt="media" className="rounded-md" />
               </div>
             ))}
           </div>
