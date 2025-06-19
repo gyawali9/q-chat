@@ -1,0 +1,5 @@
+{
+  "watch": ["server.ts", "src"],
+  "ext": "ts",
+  "exec": "node --no-warnings --loader ts-node/esm server.ts"
+}
