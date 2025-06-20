@@ -1,6 +1,7 @@
-import type { Dispatch, SetStateAction } from "react";
+import { useContext, type Dispatch, type SetStateAction } from "react";
 import assets, { userDummyData, type IUser } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 interface SidebarProps {
   selectedUser: IUser | null;
@@ -8,6 +9,7 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ selectedUser, setSelectedUser }: SidebarProps) => {
+  const { logout } = useContext(AuthContext)!;
   const navigate = useNavigate();
   return (
     <div
@@ -32,7 +34,9 @@ const Sidebar = ({ selectedUser, setSelectedUser }: SidebarProps) => {
                 Edit Profile
               </p>
               <hr className="my-2 border-t border-gray-500" />
-              <p className="cursor-pointer text-sm">Logout</p>
+              <p onClick={() => logout()} className="cursor-pointer text-sm">
+                Logout
+              </p>
             </div>
           </div>
         </div>
