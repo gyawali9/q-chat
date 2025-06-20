@@ -1,5 +1,5 @@
 import { Connection } from "mongoose";
-import { UserDocument } from "./models/user.model";
+import { IUser } from "./src/models/user.model";
 
 declare global {
   var mongoose: {
@@ -8,7 +8,7 @@ declare global {
   };
   namespace Express {
     interface Request {
-      user?: UserDocument;
+      user: IUser;
     }
   }
 }

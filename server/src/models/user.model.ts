@@ -1,7 +1,7 @@
-import { Document, model, Schema, Types } from "mongoose";
+import { model, Schema, Types } from "mongoose";
 
-export interface UserDocument extends Document {
-  _id: Types.ObjectId;
+export interface IUser {
+  _id?: Types.ObjectId;
   fullName: string;
   email: string;
   password: string;
@@ -10,7 +10,7 @@ export interface UserDocument extends Document {
   createdAt?: Date;
   updatedAt?: Date;
 }
-const userSchema = new Schema(
+const userSchema = new Schema<IUser>(
   {
     fullName: {
       type: String,
@@ -30,6 +30,6 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-const User = model<UserDocument>("User", userSchema);
+const User = model<IUser>("User", userSchema);
 
 export default User;

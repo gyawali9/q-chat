@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import User from "../models/user.model.js";
-import { getErrorMessage } from "../lib/utils.js";
+import User from "../models/user.model";
+import { getErrorMessage } from "../lib/utils";
 
 // middleware to protect routes
 const authorize = async (req: Request, res: Response, next: NextFunction) => {

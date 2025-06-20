@@ -1,8 +1,10 @@
 import express, { Request, Response } from "express";
-import "dotenv/config";
+import dotenv from "dotenv";
 import cors from "cors";
 import http from "http";
-import { connectDB } from "./lib/db.js";
+import { connectDB } from "./src/lib/db";
+
+dotenv.config();
 
 // create express app and http server (socket.io support )
 const app = express();
@@ -23,9 +25,11 @@ app.get("/", (req: Request, res: Response) => {
 const port = process.env.PORT || 5001;
 
 // connect to database
-await connectDB();
 
-server.listen(port, () => console.log("Server running on Port:" + port));
+server.listen(port, async () => {
+  await connectDB();
+  console.log("Server running on Port:" + port);
+});
 server.on("error", (err) => {
   console.error("❌ Server failed to start:", err.message);
 });
