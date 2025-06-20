@@ -4,12 +4,45 @@ import cors from "cors";
 import http from "http";
 import { connectDB } from "./src/lib/db";
 import userRouter from "./src/routes/user.route";
+import { errorHandler } from "./src/middleware/error.middleware";
+import messageRouter from "./src/routes/message.route";
+import { Server } from "socket.io";
 
 dotenv.config();
 
 // create express app and http server (socket.io support )
 const app = express();
 const server = http.createServer(app);
+
+// initialize socket.io server
+export const io = new Server(server, {
+  cors: { origin: "*" },
+});
+
+// store online users
+export const userSocketmap: Record<string, string> = {
+  // {userId: socketId}
+};
+
+// socket.io connection handler
+io.on("connection", (socket) => {
+  const userId = socket.handshake.query.userId as string;
+
+  if (typeof userId === "string") {
+    console.log("User Connected", userId);
+    if (userId) userSocketmap[userId] = socket.id;
+  }
+
+  // Emit onlineusers to all connected clients
+  io.emit("getOnlineusers", Object.keys(userSocketmap));
+
+  // disconnect events
+  socket.on("disconnect", () => {
+    console.log("User Disconnected", userId);
+    delete userSocketmap[userId];
+    io.emit("getOnlineUsers", Object.keys(userSocketmap));
+  });
+});
 
 // middleware setup
 app.use(
@@ -21,6 +54,10 @@ app.use(cors());
 
 // routes setup
 app.use("/api/v1/auth", userRouter);
+app.use("/api/v1/messages", messageRouter);
+
+// ✅ Error handling middleware (always at end)
+app.use(errorHandler);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Server is live");

@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import User from "../models/user.model";
 import bcrypt from "bcryptjs";
 import { generateToken, getErrorMessage } from "../lib/utils";
@@ -6,7 +6,11 @@ import { ApiError } from "../lib/apiError";
 import cloudinary from "../lib/cloudinary";
 
 // sign up new user
-export const signUp = async (req: Request, res: Response) => {
+export const signUp = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { fullName, email, password, bio } = req.body;
 
   try {
@@ -39,7 +43,7 @@ export const signUp = async (req: Request, res: Response) => {
       message: "Account Created Successfully",
     });
   } catch (error) {
-    throw error;
+    next(error);
   }
 };
 
