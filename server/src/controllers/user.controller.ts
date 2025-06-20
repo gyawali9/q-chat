@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
-import User from "../models/user.model.js";
+import User from "../models/user.model";
 import bcrypt from "bcryptjs";
-import { generateToken, getErrorMessage } from "../lib/utils.js";
+import { generateToken, getErrorMessage } from "../lib/utils";
+import { ApiError } from "../lib/apiError";
+import cloudinary from "../lib/cloudinary";
 
 // sign up new user
 export const signUp = async (req: Request, res: Response) => {
@@ -9,18 +11,12 @@ export const signUp = async (req: Request, res: Response) => {
 
   try {
     if (!fullName || !email || !password || !bio) {
-      return res.json({
-        status: false,
-        message: "Missing Details",
-      });
+      throw new ApiError(400, "Missing required fields");
     }
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.json({
-        status: false,
-        message: "User aleady exists",
-      });
+      throw new ApiError(409, "User already exists");
     }
     // hash password
     const salt = await bcrypt.genSalt(10);
@@ -43,10 +39,7 @@ export const signUp = async (req: Request, res: Response) => {
       message: "Account Created Successfully",
     });
   } catch (error) {
-    res.json({
-      success: false,
-      message: getErrorMessage(error),
-    });
+    throw error;
   }
 };
 
@@ -58,19 +51,13 @@ export const login = async (req: Request, res: Response) => {
 
     // check if user has registered
     if (!user) {
-      return res.status(401).json({
-        status: false,
-        message: "User not found",
-      });
+      throw new ApiError(401, "User not found");
     }
 
     // check if password is correct
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(404).json({
-        status: false,
-        message: "Invalid Password",
-      });
+      throw new ApiError(401, "Invalid password");
     }
 
     const token = generateToken(user?._id.toString());
@@ -81,10 +68,7 @@ export const login = async (req: Request, res: Response) => {
       message: "Login Successful",
     });
   } catch (error) {
-    res.json({
-      success: false,
-      message: getErrorMessage(error),
-    });
+    throw error;
   }
 };
 
@@ -94,4 +78,43 @@ export const checkAuth = (req: Request, res: Response) => {
     success: true,
     user: req.user,
   });
+};
+
+// controller to update user profile details
+export const updateProfile = async (req: Request, res: Response) => {
+  try {
+    const { profilePic, fullName, bio } = req.body;
+
+    const userId = req.user?._id;
+    let updatedUser;
+
+    if (!profilePic) {
+      updatedUser = await User.findByIdAndUpdate(
+        userId,
+        {
+          bio,
+          fullName,
+        },
+        { new: true }
+      );
+    } else {
+      const upload = await cloudinary.uploader.upload(profilePic);
+
+      updatedUser = await User.findByIdAndUpdate(
+        userId,
+        {
+          profilePic: upload.secure_url,
+          bio,
+          fullName,
+        },
+        { new: true }
+      );
+    }
+    res.status(200).json({
+      success: true,
+      user: updatedUser,
+    });
+  } catch (error) {
+    throw error;
+  }
 };

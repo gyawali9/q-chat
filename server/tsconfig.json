@@ -115,8 +115,9 @@
     /* Completeness */
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true /* Skip type checking all .d.ts files. */,
-    "types": ["node", "express"]
+    "types": ["node", "express"],
+    "typeRoots": ["./src/types", "./node_modules/@types"]
   },
-  "include": ["server.ts", "src", "**/*.ts", "src/lib/utils.tsx"],
+  "include": ["server.ts", "src/**/*"], // ✅ includes your types and controllers
   "exclude": ["node_modules"]
 }

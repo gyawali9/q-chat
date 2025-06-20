@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import http from "http";
 import { connectDB } from "./src/lib/db";
+import userRouter from "./src/routes/user.route";
 
 dotenv.config();
 
@@ -17,6 +18,9 @@ app.use(
   })
 );
 app.use(cors());
+
+// routes setup
+app.use("/api/v1/auth", userRouter);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Server is live");

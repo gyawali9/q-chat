@@ -1,39 +1,34 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/user.model";
-import { getErrorMessage } from "../lib/utils";
+import { ApiError } from "../lib/apiError";
 
-// middleware to protect routes
-const authorize = async (req: Request, res: Response, next: NextFunction) => {
+export const protectRoute: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    let token;
-
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
-    ) {
-      token = req.headers.authorization.split(" ")[1];
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      throw new ApiError(401, "Unauthorized - No token provided");
     }
 
-    if (!token) return res.status(401).json({ message: "Unauthorized" });
-
+    const token = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
 
     if (typeof decoded !== "object" || !("userId" in decoded)) {
-      return res.status(401).json({ message: "Invalid token payload" });
+      throw new ApiError(401, "Invalid token payload");
     }
 
     const user = await User.findById(decoded.userId).select("-password");
-
-    if (!user) return res.status(401).json({ message: "User not found" });
+    if (!user) {
+      throw new ApiError(401, "User not found");
+    }
 
     req.user = user;
-
     next();
   } catch (error) {
-    res.status(401).json({
-      success: false,
-      message: getErrorMessage(error) || "Unauthorized",
-    });
+    next(error);
   }
 };
