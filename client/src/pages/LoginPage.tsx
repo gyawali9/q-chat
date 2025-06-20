@@ -1,5 +1,19 @@
-import { useState, type FormEvent } from "react";
+import { useContext, useState, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+
 import assets from "../assets/assets";
+import { AuthContext } from "../context/AuthContext";
+
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+export interface RegisterPayload extends LoginPayload {
+  fullName: string;
+  bio: string;
+}
 
 const LoginPage = () => {
   const [currentState, setCurrentState] = useState("Sign up");
@@ -9,11 +23,48 @@ const LoginPage = () => {
   const [bio, setBio] = useState("");
   const [isDataSubmitted, setIsDataSubmitted] = useState(false);
 
-  const onSubmitHandler = (event: FormEvent<HTMLFormElement>) => {
+  const navigate = useNavigate();
+
+  const { login } = useContext(AuthContext)!;
+
+  const onSubmitHandler = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (currentState === "Sign up" && !isDataSubmitted) {
       setIsDataSubmitted(true);
       return;
+    }
+    try {
+      if (currentState === "Sign up") {
+        const payload: RegisterPayload = {
+          fullName,
+          email,
+          password,
+          bio,
+        };
+        await login("signup", payload);
+
+        // resetting the form fields
+        setFullName("");
+        setEmail("");
+        setPassword("");
+        setBio("");
+
+        setIsDataSubmitted(false);
+        setCurrentState("Login");
+      } else {
+        const payload: LoginPayload = {
+          email,
+          password,
+        };
+        await login("login", payload);
+        setEmail("");
+        setPassword("");
+
+        navigate("/");
+      }
+    } catch (error) {
+      console.log(error, "loginhandle error");
+      toast.error("Something went wrong. Please try again.");
     }
   };
 
