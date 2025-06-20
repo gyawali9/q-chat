@@ -14,10 +14,12 @@ export const signUp = async (
   const { fullName, email, password, bio } = req.body;
 
   try {
+    // Validate required fields
     if (!fullName || !email || !password || !bio) {
       throw new ApiError(400, "Missing required fields");
     }
 
+    // Check for existing user
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       throw new ApiError(409, "User already exists");
@@ -36,9 +38,12 @@ export const signUp = async (
 
     // generate token
     const token = generateToken(newUser._id.toString());
+
+    // Get user without password
+    const userToSend = await User.findById(newUser._id).select("-password");
     res.status(201).json({
       success: true,
-      userData: newUser,
+      userData: userToSend,
       token,
       message: "Account Created Successfully",
     });
@@ -51,7 +56,7 @@ export const signUp = async (
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select("+password");
 
     // check if user has registered
     if (!user) {
@@ -72,6 +77,7 @@ export const login = async (req: Request, res: Response) => {
       message: "Login Successful",
     });
   } catch (error) {
+    console.log(error, "yoerrorho");
     throw error;
   }
 };
