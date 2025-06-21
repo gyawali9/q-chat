@@ -1,16 +1,39 @@
-import { useState, type FormEvent } from "react";
+import { useContext, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import assets from "../assets/assets";
+import { AuthContext } from "../context/AuthContext";
 
 const ProfilePage = () => {
+  const { authUser, updateProfile } = useContext(AuthContext)!;
+
   const [selectedImg, setSelectedImg] = useState<File | null>(null);
-  const [name, setName] = useState("Martin Johnson");
-  const [bio, setBio] = useState("Hi everyone, I am using Q chat.");
+  const [name, setName] = useState(authUser?.fullName);
+  const [bio, setBio] = useState(authUser?.bio);
   const navigate = useNavigate();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    navigate("/");
+    if (!selectedImg) {
+      await updateProfile({
+        fullName: name,
+        bio,
+      });
+      navigate("/");
+      return;
+    }
+    // before converting to base64 image
+    const reader = new FileReader();
+    reader.readAsDataURL(selectedImg);
+    reader.onload = async () => {
+      const base64Image = reader.result;
+      if (typeof base64Image === "string") {
+        await updateProfile({
+          profilePic: base64Image,
+          fullName: name,
+          bio,
+        });
+      }
+    };
   };
 
   return (
@@ -72,8 +95,10 @@ const ProfilePage = () => {
           </button>
         </form>
         <img
-          className="max-w-44 aspect-square rounded-full mx-10 max-sm:mt-10"
-          src={assets.logo_icon}
+          className={`max-w-44 aspect-square rounded-full mx-10 max-sm:mt-10 ${
+            selectedImg && "rounded-full"
+          }`}
+          src={authUser?.profilePic || assets.logo_icon}
           alt="logo"
         />
       </div>

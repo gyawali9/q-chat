@@ -1,4 +1,4 @@
-import { api } from "../api/axiox";
+import { api } from "../api/axios";
 import { MESSAGE_ENDPOINTS } from "../constants/endpoints";
 
 import type { ApiResponse } from "../types/api";
