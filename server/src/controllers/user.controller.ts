@@ -5,6 +5,13 @@ import { generateToken } from "../lib/utils";
 import { ApiError } from "../lib/apiError";
 import cloudinary from "../lib/cloudinary";
 
+// fields for updating
+interface ProfileUpdateFields {
+  fullName?: string;
+  bio?: string;
+  profilePic?: string;
+}
+
 // sign up new user
 export const signUp = async (
   req: Request,
@@ -43,8 +50,10 @@ export const signUp = async (
     const userToSend = await User.findById(newUser._id).select("-password");
     res.status(201).json({
       success: true,
-      userData: userToSend,
-      token,
+      data: {
+        user: userToSend,
+        token,
+      },
       message: "Account Created Successfully",
     });
   } catch (error) {
@@ -70,14 +79,17 @@ export const login = async (req: Request, res: Response) => {
     }
 
     const token = generateToken(user?._id.toString());
+    const userData = await User.findById(user._id).select("-password");
+
     res.status(200).json({
       success: true,
-      userData: user,
-      token,
+      data: {
+        user: userData,
+        token,
+      },
       message: "Login Successful",
     });
   } catch (error) {
-    console.log(error, "yoerrorho");
     throw error;
   }
 };
@@ -86,7 +98,10 @@ export const login = async (req: Request, res: Response) => {
 export const checkAuth = (req: Request, res: Response) => {
   res.status(200).json({
     success: true,
-    user: req.user,
+    data: {
+      user: req.user,
+    },
+    message: "User is authenticated",
   });
 };
 
@@ -104,33 +119,24 @@ export const updateProfile = async (
       throw new ApiError(401, "Unauthorized - User ID missing");
     }
 
-    let updatedUser;
+    // let updatedUser;
 
-    if (!profilePic) {
-      updatedUser = await User.findByIdAndUpdate(
-        userId,
-        {
-          bio,
-          fullName,
-        },
-        { new: true }
-      );
-    } else {
+    let updateFields: ProfileUpdateFields = { fullName, bio };
+    if (profilePic) {
       const upload = await cloudinary.uploader.upload(profilePic);
-
-      updatedUser = await User.findByIdAndUpdate(
-        userId,
-        {
-          profilePic: upload.secure_url,
-          bio,
-          fullName,
-        },
-        { new: true }
-      );
+      updateFields.profilePic = upload.secure_url;
     }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateFields, {
+      new: true,
+    }).select("-password");
+
     res.status(200).json({
       success: true,
-      user: updatedUser,
+      data: {
+        user: updatedUser,
+      },
+      message: "Profile updated successfully",
     });
   } catch (error) {
     next(error);
