@@ -3,13 +3,8 @@ import { AUTH_ENDPOINTS } from "../constants/endpoints";
 import type { LoginPayload, RegisterPayload } from "../pages/LoginPage";
 
 import type { ApiResponse } from "../types/api";
+import type { UpdateProfilePayload } from "../types/auth";
 import type { User } from "../types/user";
-
-interface IUpdateProfile {
-  fullName: string;
-  bio: string;
-  profilePic?: string;
-}
 
 export const loginUser = (
   state: string,
@@ -18,6 +13,6 @@ export const loginUser = (
 
 export const checkAuth = () => api.get<ApiResponse<User>>(AUTH_ENDPOINTS.CHECK);
 
-export const updateProfile = (body: IUpdateProfile) => {
+export const updateProfile = (body: UpdateProfilePayload) => {
   return api.put<ApiResponse<User>>(AUTH_ENDPOINTS.UPDATE_PROFILE, body);
 };

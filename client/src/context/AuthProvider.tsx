@@ -8,6 +8,7 @@ import { AuthContext } from "./AuthContext";
 import type { User } from "../types/user";
 import type { ApiResponse } from "../types/api";
 import type { LoginPayload, RegisterPayload } from "../pages/LoginPage";
+import type { UpdateProfilePayload } from "../types/auth";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setToken] = useState<string | null>(
@@ -72,7 +73,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   //   update profile function to handle user profile updates
-  const updateProfile = async (body: unknown) => {
+  const updateProfile = async (body: UpdateProfilePayload) => {
     try {
       const { data } = await updateUser(body);
       if (data.success) {
