@@ -1,11 +1,17 @@
-export interface LoginPayload {
+interface LoginPayload {
   email: string;
   password: string;
 }
 
-export interface UpdateProfilePayload {
+interface RegisterPayload extends LoginPayload {
+  fullName: string;
+  bio: string;
+}
+
+interface UpdateProfilePayload {
   fullName?: string;
   bio?: string;
   profilePic?: string;
-  // optional; add/remove fields based on your form
 }
+
+export type { LoginPayload, RegisterPayload, UpdateProfilePayload };

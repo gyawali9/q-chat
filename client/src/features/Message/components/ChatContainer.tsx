@@ -1,11 +1,12 @@
 import { useEffect, useRef, type Dispatch, type SetStateAction } from "react";
-import type { IUser } from "../assets/assets";
-import assets, { messagesDummyData } from "../assets/assets";
-import { formatMessageTime } from "../lib/utils";
+
+import assets, { messagesDummyData } from "../../../assets/assets";
+import { formatMessageTime } from "../../../utility";
+import type { User } from "../../../types/user";
 
 interface ChatContainerProps {
-  selectedUser: IUser | null;
-  setSelectedUser: Dispatch<SetStateAction<IUser | null>>;
+  selectedUser: User | null;
+  setSelectedUser: Dispatch<SetStateAction<User | null>>;
 }
 
 const ChatContainer = ({

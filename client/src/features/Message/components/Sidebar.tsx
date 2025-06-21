@@ -1,11 +1,13 @@
 import { useContext, type Dispatch, type SetStateAction } from "react";
-import assets, { userDummyData, type IUser } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
+
+import type { User } from "../../../types/user";
+import { AuthContext } from "../../../context/AuthContext";
+import assets, { userDummyData } from "../../../assets/assets";
 
 interface SidebarProps {
-  selectedUser: IUser | null;
-  setSelectedUser: Dispatch<SetStateAction<IUser | null>>;
+  selectedUser: User | null;
+  setSelectedUser: Dispatch<SetStateAction<User | null>>;
 }
 
 const Sidebar = ({ selectedUser, setSelectedUser }: SidebarProps) => {

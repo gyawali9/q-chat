@@ -3,12 +3,19 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 import { useSocket } from "../hooks/useSocket";
-import { checkAuth, loginUser, updateProfile as updateUser } from "../lib/auth";
+import {
+  checkAuth,
+  loginUser,
+  updateProfile as updateUser,
+} from "../features/Auth/hooks/query";
 import { AuthContext } from "./AuthContext";
 import type { User } from "../types/user";
-import type { ApiResponse } from "../types/api";
-import type { LoginPayload, RegisterPayload } from "../pages/LoginPage";
-import type { UpdateProfilePayload } from "../types/auth";
+import type {
+  LoginPayload,
+  RegisterPayload,
+  UpdateProfilePayload,
+} from "../types/auth";
+import type { ErrorResponse } from "../types/api";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setToken] = useState<string | null>(
@@ -23,7 +30,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const { data } = await checkAuth();
       if (data.success) {
-        setAuthUser(data.user ?? null);
+        const { user } = data.data;
+        setAuthUser(user ?? null);
       }
     } catch (error) {
       console.log(error, "checkandsetauth");
@@ -38,10 +46,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const { data } = await loginUser(state, credentials);
       if (data.success) {
-        setAuthUser(data.userData ?? null);
-        setToken(data.token ?? null);
-        if (data.token) {
-          localStorage.setItem("token", data.token);
+        const { user, token } = data.data;
+
+        setAuthUser(user ?? null);
+        setToken(token ?? null);
+        if (token) {
+          localStorage.setItem("token", token);
         }
         toast.success(data.message ?? "Login successful");
       } else {
@@ -49,7 +59,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        const apiError = error.response?.data as ApiResponse;
+        const apiError = error.response?.data as ErrorResponse;
         if (apiError?.errors?.length) {
           apiError.errors.forEach((e) => toast.error(e.message));
         } else {
@@ -77,7 +87,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const { data } = await updateUser(body);
       if (data.success) {
-        setAuthUser(data.user ?? null);
+        const { user } = data.data;
+        setAuthUser(user ?? null);
         toast.success("Profile changed successfully");
       }
     } catch (error) {

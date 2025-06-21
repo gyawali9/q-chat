@@ -1,9 +1,8 @@
-// import type { Dispatch, SetStateAction } from "react";
-import type { IUser } from "../assets/assets";
-import assets, { imagesDummyData } from "../assets/assets";
+import assets, { imagesDummyData } from "../../../assets/assets";
+import type { User } from "../../../types/user";
 
 interface RightSidebarProps {
-  selectedUser: IUser | null;
+  selectedUser: User | null;
   // setSelectedUser: Dispatch<SetStateAction<IUser | null>>;
 }
 const RightSidebar = ({ selectedUser }: RightSidebarProps) => {

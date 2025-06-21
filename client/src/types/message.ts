@@ -1,4 +1,4 @@
-export interface Message {
+interface Message {
   _id: string;
   senderId: string;
   receiverId: string;
@@ -8,3 +8,10 @@ export interface Message {
   createdAt: string;
   updatedAt: string;
 }
+
+interface SendMessagePayload {
+  text?: string;
+  image?: string;
+}
+
+export type { Message, SendMessagePayload };

@@ -1,15 +1,14 @@
 import axios from "axios";
-
-import type { ApiResponse } from "../types/api";
+import type { ErrorResponse } from "../types/api";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-export const api = axios.create({
+export const httpClient = axios.create({
   baseURL: backendUrl,
 });
 
 // Axios interceptor to attach token
-api.interceptors.request.use((config) => {
+httpClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`; // ✅ correct header format
@@ -18,10 +17,10 @@ api.interceptors.request.use((config) => {
 });
 
 // Optional: centralized error interceptor (logging or toast)
-api.interceptors.response.use(
+httpClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    const apiError = error.response?.data as ApiResponse;
+    const apiError = error.response?.data as ErrorResponse;
 
     if (apiError?.message) {
       console.error("API Error:", apiError.message);

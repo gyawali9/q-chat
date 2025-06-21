@@ -4,16 +4,7 @@ import toast from "react-hot-toast";
 
 import assets from "../assets/assets";
 import { AuthContext } from "../context/AuthContext";
-
-export interface LoginPayload {
-  email: string;
-  password: string;
-}
-
-export interface RegisterPayload extends LoginPayload {
-  fullName: string;
-  bio: string;
-}
+import type { LoginPayload, RegisterPayload } from "../types/auth";
 
 const LoginPage = () => {
   const [currentState, setCurrentState] = useState("Sign up");

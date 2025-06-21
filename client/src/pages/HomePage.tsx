@@ -1,11 +1,12 @@
 import { useState } from "react";
-import Sidebar from "../components/Sidebar";
-import ChatContainer from "../components/ChatContainer";
-import RightSidebar from "../components/RightSidebar";
-import type { IUser } from "../assets/assets";
+
+import Sidebar from "../features/Message/components/Sidebar";
+import ChatContainer from "../features/Message/components/ChatContainer";
+import RightSidebar from "../features/Message/components/RightSidebar";
+import type { User } from "../types/user";
 
 const HomePage = () => {
-  const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   return (
     <div className="border w-full h-screen sm:px-[15%] sm:py-[5%]">
       <div

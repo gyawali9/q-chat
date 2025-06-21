@@ -2,8 +2,11 @@ import { createContext } from "react";
 import { Socket } from "socket.io-client";
 
 import type { User } from "../types/user";
-import type { UpdateProfilePayload } from "../types/auth";
-import type { LoginPayload, RegisterPayload } from "../pages/LoginPage";
+import type {
+  LoginPayload,
+  RegisterPayload,
+  UpdateProfilePayload,
+} from "../types/auth";
 
 export interface AuthContextProps {
   token: string | null;
