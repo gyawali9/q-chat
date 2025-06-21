@@ -2,11 +2,12 @@ import express, { Request, Response } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import http from "http";
+import { Server } from "socket.io";
+
 import { connectDB } from "./src/lib/db";
 import userRouter from "./src/routes/user.route";
 import { errorHandler } from "./src/middleware/error.middleware";
 import messageRouter from "./src/routes/message.route";
-import { Server } from "socket.io";
 
 dotenv.config();
 

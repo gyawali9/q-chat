@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import User from "../models/user.model";
 import bcrypt from "bcryptjs";
-import { generateToken, getErrorMessage } from "../lib/utils";
+import { generateToken } from "../lib/utils";
 import { ApiError } from "../lib/apiError";
 import cloudinary from "../lib/cloudinary";
 
@@ -91,11 +91,19 @@ export const checkAuth = (req: Request, res: Response) => {
 };
 
 // controller to update user profile details
-export const updateProfile = async (req: Request, res: Response) => {
+export const updateProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { profilePic, fullName, bio } = req.body;
-
     const userId = req.user?._id;
+
+    if (!userId) {
+      throw new ApiError(401, "Unauthorized - User ID missing");
+    }
+
     let updatedUser;
 
     if (!profilePic) {
@@ -125,6 +133,6 @@ export const updateProfile = async (req: Request, res: Response) => {
       user: updatedUser,
     });
   } catch (error) {
-    throw error;
+    next(error);
   }
 };
