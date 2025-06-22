@@ -1,11 +1,10 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { ApiError } from "../lib/apiError";
 
 export const errorHandler = (
   err: Error | ApiError,
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ) => {
   const statusCode = (err instanceof ApiError && err.statusCode) || 500;
 

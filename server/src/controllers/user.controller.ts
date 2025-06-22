@@ -62,7 +62,11 @@ export const signUp = async (
 };
 
 // controller for login
-export const login = async (req: Request, res: Response) => {
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email }).select("+password");
@@ -90,7 +94,7 @@ export const login = async (req: Request, res: Response) => {
       message: "Login Successful",
     });
   } catch (error) {
-    throw error;
+    next(error);
   }
 };
 
@@ -119,9 +123,7 @@ export const updateProfile = async (
       throw new ApiError(401, "Unauthorized - User ID missing");
     }
 
-    // let updatedUser;
-
-    let updateFields: ProfileUpdateFields = { fullName, bio };
+    const updateFields: ProfileUpdateFields = { fullName, bio };
     if (profilePic) {
       const upload = await cloudinary.uploader.upload(profilePic);
       updateFields.profilePic = upload.secure_url;
