@@ -66,12 +66,18 @@ app.get("/", (req: Request, res: Response) => {
 
 const port = process.env.PORT || 5001;
 
-// connect to database
-
-server.listen(port, async () => {
+const startServer = async () => {
   await connectDB();
-  console.log("Server running on Port:" + port);
+  server.listen(port, () => {
+    console.log("Server running on Port:" + port);
+  });
+};
+
+startServer().catch((err) => {
+  console.error("Failed to start server:", err);
+  process.exit(1);
 });
+
 server.on("error", (err) => {
   console.error("❌ Server failed to start:", err.message);
 });
