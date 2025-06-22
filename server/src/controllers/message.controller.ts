@@ -41,8 +41,11 @@ export const getUsersForSidebar = async (
     await Promise.all(promises);
     res.status(200).json({
       success: true,
-      users: filteredUsers,
-      unseenMessages,
+      data: {
+        users: filteredUsers,
+        unseenMessages,
+      },
+      message: "Users fetched successfully",
     });
   } catch (error) {
     next(error);
@@ -84,7 +87,8 @@ export const getMessages = async (
     );
     res.status(200).json({
       success: true,
-      messages,
+      data: messages,
+      message: "Messages fetched successfully",
     });
   } catch (error) {
     next(error);
@@ -92,7 +96,7 @@ export const getMessages = async (
 };
 
 // api to mark message as seen using message id
-export const MarkMessageAsSeen = async (
+export const markMessageAsSeen = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -100,7 +104,11 @@ export const MarkMessageAsSeen = async (
   try {
     const { id } = req.params;
     await Message.findByIdAndUpdate(id, { seen: true });
-    res.status(200).json({ success: true });
+    res.status(200).json({
+      success: true,
+      data: null,
+      message: "Message marked as seen",
+    });
   } catch (error) {
     next(error);
   }
@@ -114,19 +122,28 @@ export const sendMessage = async (
   next: NextFunction
 ) => {
   try {
-    const { text, image } = req.body;
+    // const { text, image } = req.body;
     const receiverId = req.params.id;
     const senderId = req.user?._id;
 
+    if (!receiverId || typeof receiverId !== "string") {
+      throw new ApiError(400, "Receiver ID is required");
+    }
+
+    if (!req.body.text && !req.body.image) {
+      throw new ApiError(400, "Either text or image is required");
+    }
+
     let imageUrl;
-    if (image) {
+    if (req.body?.image) {
+      const image = req.body.image;
       const uploadResponse = await cloudinary.uploader.upload(image);
       imageUrl = uploadResponse.secure_url;
     }
-    const newMessage = Message.create({
+    const newMessage = await Message.create({
       senderId,
       receiverId,
-      text,
+      text: req.body?.text,
       image: imageUrl,
     });
 
@@ -138,7 +155,8 @@ export const sendMessage = async (
 
     res.status(200).json({
       success: true,
-      newMessage,
+      data: newMessage,
+      message: "Message sent successfully",
     });
   } catch (error) {
     next(error);
