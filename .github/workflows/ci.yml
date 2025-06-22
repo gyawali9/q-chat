@@ -1,0 +1,50 @@
+name: CI Workflow
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [22]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # Backend build
+      - name: Install Backend Dependencies
+        working-directory: ./server
+        run: npm ci
+
+      - name: Run Backend Lint/Test
+        working-directory: ./server
+        run: |
+          npm run lint
+          npm run test
+
+      # Frontend build
+      - name: Install Frontend Dependencies
+        working-directory: ./client
+        run: npm ci
+
+      - name: Run Frontend Lint/Test
+        working-directory: ./client
+        run: |
+          npm run lint
+          npm run test
+
+      - name: Build Frontend
+        working-directory: ./client
+        run: npm run build
