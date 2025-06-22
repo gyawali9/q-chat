@@ -8,7 +8,7 @@ import {
   loginUser,
   updateProfile as updateUser,
 } from "../features/Auth/hooks/query";
-import { AuthContext } from "./AuthContext";
+import { AuthContext } from "../context/AuthContext";
 import type { User } from "../types/user";
 import type {
   LoginPayload,

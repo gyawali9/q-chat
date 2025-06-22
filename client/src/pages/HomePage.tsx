@@ -6,7 +6,7 @@ import RightSidebar from "../features/Message/components/RightSidebar";
 import type { User } from "../types/user";
 
 const HomePage = () => {
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUser] = useState<User | null>(null);
   return (
     <div className="border w-full h-screen sm:px-[15%] sm:py-[5%]">
       <div
@@ -16,18 +16,9 @@ const HomePage = () => {
             : "md:grid-cols-2"
         }`}
       >
-        <Sidebar
-          selectedUser={selectedUser}
-          setSelectedUser={setSelectedUser}
-        />
-        <ChatContainer
-          selectedUser={selectedUser}
-          setSelectedUser={setSelectedUser}
-        />
-        <RightSidebar
-          selectedUser={selectedUser}
-          // setSelectedUser={setSelectedUser}
-        />
+        <Sidebar />
+        <ChatContainer />
+        <RightSidebar selectedUser={selectedUser} />
       </div>
     </div>
   );
