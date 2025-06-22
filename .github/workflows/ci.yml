@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [20]
+        node-version: [22.15.0]
 
     steps:
       - name: Checkout repository
@@ -23,7 +23,10 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      # Backend build
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      # Backend
       - name: Install Backend Dependencies
         working-directory: ./server
         run: npm ci
@@ -34,7 +37,7 @@ jobs:
           npm run lint
           npm run test
 
-      # Frontend build
+      # Frontend
       - name: Install Frontend Dependencies
         working-directory: ./client
         run: npm ci
