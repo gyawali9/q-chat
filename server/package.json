@@ -6,7 +6,8 @@
     "dev": "nodemon server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "lint": "eslint src --ext .ts"
+    "lint": "eslint src --ext .ts",
+    "test": "echo \"No tests yet\" && exit 0"
   },
   "engines": {
     "node": "22.15.0"
