@@ -19,6 +19,7 @@ export interface AuthContextProps {
   ) => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (body: UpdateProfilePayload) => Promise<void>;
+  authLoading: boolean;
 }
 
 export const AuthContext = createContext<AuthContextProps | null>(null);

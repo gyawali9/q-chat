@@ -10,6 +10,11 @@ export const ProtectedRoutes = ({
 }) => {
   const context = useContext(AuthContext);
   if (!context) return <Navigate to="/login" />;
-  const { authUser } = context;
-  return authUser ? children : <Navigate to="/login" />;
+
+  const { authUser, authLoading } = context;
+  // Wait until auth check is complete
+  if (authLoading) return null;
+
+  // return authUser ? children : <Navigate to="/login" />;
+  return authUser ? <>{children}</> : <Navigate to="/login" />;
 };

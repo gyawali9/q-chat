@@ -28,7 +28,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const { socket } = useContext(AuthContext)!;
 
   // function to get all users for sidebar
-  const getusers = async () => {
+  const getusers = useCallback(async () => {
     try {
       const { data } = await getUsersForSidebar();
       if (data.success) {
@@ -49,7 +49,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
         toast.error("Something went wrong.");
       }
     }
-  };
+  }, []);
 
   // function to get messages for selected users
   const getMessages = async (userId: string) => {

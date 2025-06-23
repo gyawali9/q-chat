@@ -23,6 +23,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
   const [authUser, setAuthUser] = useState<User | null>(null);
   const [onlineUser, setOnlineUser] = useState<string[]>([]);
+  const [authLoading, setAuthLoading] = useState(true);
 
   const socket = useSocket(authUser?._id, setOnlineUser);
 
@@ -32,10 +33,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (data.success) {
         const { user } = data.data;
         setAuthUser(user ?? null);
+      } else {
+        // Token is invalid or expired
+        // later refersh token logic
+        logout(); // Automatically logout
       }
     } catch (error) {
-      console.log(error, "checkandsetauth");
-      // toast.error(error?.message || "Authentication Failed");
+      console.log(error, "checkAuth error");
+
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        toast.error("Session expired. Please login again.");
+        logout(); // Clear token, user, etc.
+      } else {
+        toast.error("Authentication failed.");
+      }
     }
   };
 
@@ -101,10 +112,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    if (token) {
-      checktAndSetAuth();
-    }
+    const initAuth = async () => {
+      if (token) {
+        try {
+          await checktAndSetAuth(); // await this
+        } catch (error) {
+          console.error("Auth check failed:", error);
+        }
+      }
+      setAuthLoading(false); // Done checking, now allow render
+    };
+
+    initAuth(); // Call the async wrapper
   }, [token]);
+
+  console.log(token, authUser, authLoading, "sabikologin");
 
   const value = {
     token,
@@ -114,6 +136,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     login,
     logout,
     updateProfile,
+    authLoading,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
