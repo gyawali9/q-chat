@@ -1,5 +1,9 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import jwt from "jsonwebtoken";
+import jwt, {
+  JsonWebTokenError,
+  NotBeforeError,
+  TokenExpiredError,
+} from "jsonwebtoken";
 import User from "../models/user.model";
 import { ApiError } from "../lib/apiError";
 
@@ -29,6 +33,22 @@ export const protectRoute: RequestHandler = async (
     req.user = user;
     next();
   } catch (error) {
-    next(error);
+    if (error instanceof TokenExpiredError) {
+      next(new ApiError(401, "Token expired"));
+    } else if (
+      error instanceof JsonWebTokenError ||
+      error instanceof NotBeforeError
+    ) {
+      next(new ApiError(401, "Invalid token"));
+    } else {
+      next(
+        new ApiError(
+          500,
+          "Something went wrong",
+          [],
+          error instanceof Error ? error.stack : ""
+        )
+      );
+    }
   }
 };

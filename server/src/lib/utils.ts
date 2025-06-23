@@ -2,13 +2,22 @@ import jwt from "jsonwebtoken";
 
 // function to generate token for a user
 export const generateToken = (userId: string) => {
-  const token = jwt.sign(
-    {
-      userId,
-    },
-    process.env.JWT_SECRET!
-  );
-  return token;
+  const accessToken = jwt.sign({ userId }, process.env.JWT_SECRET!, {
+    expiresIn: "15m", // short-lived access token
+  });
+
+  const refreshToken = jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET!, {
+    expiresIn: "7d", // long-lived refresh token
+  });
+
+  return { accessToken, refreshToken };
+};
+
+// function to generate refresh token
+export const generateRefreshToken = (userId: string) => {
+  return jwt.sign({ userId }, process.env.REFRESH_TOKEN_SECRET!, {
+    expiresIn: "30d", // or 30d, up to you
+  });
 };
 
 // function to genereate errror message based on error
