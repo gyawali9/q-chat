@@ -5,6 +5,8 @@ import toast from "react-hot-toast";
 import assets from "../assets/assets";
 import { AuthContext } from "../context/AuthContext";
 import type { LoginPayload, RegisterPayload } from "../types/auth";
+import SubmitButton from "../components/ui/SubmitButton";
+import FormInput from "../components/ui/FormInput";
 
 const LoginPage = () => {
   const [currentState, setCurrentState] = useState("Sign up");
@@ -13,7 +15,8 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [bio, setBio] = useState("");
   const [isDataSubmitted, setIsDataSubmitted] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [hasAgreed, setHasAgreed] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -26,6 +29,7 @@ const LoginPage = () => {
       return;
     }
     try {
+      setLoading(true);
       if (currentState === "Sign up") {
         const payload: RegisterPayload = {
           fullName,
@@ -57,7 +61,21 @@ const LoginPage = () => {
     } catch (error) {
       console.log(error, "loginhandle error");
       toast.error("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  // Function to disable the button
+  const shouldDisableSubmit = () => {
+    if (loading || !hasAgreed) return true;
+
+    if (currentState === "Sign up") {
+      if (!isDataSubmitted) return !(fullName && email && password);
+      return !bio;
+    }
+
+    return !(email && password);
   };
 
   return (
@@ -77,6 +95,7 @@ const LoginPage = () => {
 
       {/* right */}
       <form
+        autoComplete="off"
         onSubmit={onSubmitHandler}
         className="border-2 bg-white/8 text-white border-gray-500 p-6 flex flex-col gap-6 rounded-lg shadow-lg max-w-md w-full"
       >
@@ -92,104 +111,62 @@ const LoginPage = () => {
           )}
         </h2>
         {currentState === "Sign up" && !isDataSubmitted && (
-          <input
+          <FormInput
+            type="text"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            type="text"
-            className="p-2 border border-gray-500 rounded-md focus:outline-none"
             placeholder="Full name"
             required
           />
         )}
         {!isDataSubmitted && (
           <>
-            <input
+            <FormInput
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              type="email"
               placeholder="Email Address"
               required
-              className="p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
 
-            <div className="relative">
-              <input
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
-                required
-                className="p-2 pr-10 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full"
-              />
-
-              {/* Eye toggle icon - inline SVG */}
-              <div
-                onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600"
-              >
-                {showPassword ? (
-                  // Eye-slash SVG
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.223.22-2.392.625-3.475M4.22 4.22l15.56 15.56M9.879 9.879A3 3 0 1114.121 14.12M9.879 9.879L4.22 4.22m15.56 15.56L14.12 14.121"
-                    />
-                  </svg>
-                ) : (
-                  // Eye SVG
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                    />
-                  </svg>
-                )}
-              </div>
-            </div>
+            <FormInput
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              required
+            />
           </>
         )}
         {currentState === "Sign up" && isDataSubmitted && (
-          <textarea
+          <FormInput
+            type="textarea"
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            rows={4}
-            className="p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="Provide a short bio..."
-          ></textarea>
+            rows={4}
+          />
         )}
-        <button
-          type="submit"
-          className="py-3 bg-gradient-to-r from-purple-400 to-violet-600 text-white rounded-md cursor-pointer"
-        >
-          {currentState === "Sign up" ? "Create Account" : "Login Now"}
-        </button>
 
-        <div className="flex items-center gap-2 text-sm text-gray-500">
-          <input type="checkbox" />
-          <p>Agree to the terms of use & privacy policy.</p>
-        </div>
+        <SubmitButton
+          text={currentState === "Sign up" ? "Create Account" : "Login Now"}
+          loading={loading}
+          disabled={shouldDisableSubmit()}
+        />
+
+        <FormInput
+          type="checkbox"
+          value={hasAgreed}
+          onChange={(e) => {
+            const target = e.target as HTMLInputElement;
+            setHasAgreed(target.checked);
+          }}
+          label={
+            <p className="text-white">
+              Agree to the terms of use & privacy policy.
+            </p>
+          }
+        />
 
         <div className="flex flex-col gap-2">
           {currentState === "Sign up" ? (
@@ -202,6 +179,7 @@ const LoginPage = () => {
                   setFullName("");
                   setEmail("");
                   setPassword("");
+                  setHasAgreed(false);
                 }}
                 className="font-medium text-violet-500 cursor-pointer"
               >
@@ -216,6 +194,7 @@ const LoginPage = () => {
                   setCurrentState("Sign up");
                   setEmail("");
                   setPassword("");
+                  setHasAgreed(false);
                 }}
                 className="font-medium text-violet-500 cursor-pointer"
               >
