@@ -18,7 +18,13 @@ const server = http.createServer(app);
 
 // initialize socket.io server
 export const io = new Server(server, {
-  cors: { origin: "*" },
+  cors: {
+    origin:
+      process.env.NODE_ENV !== "development"
+        ? process.env.FRONTEND_URL
+        : "http://localhost:5173",
+    credentials: true,
+  },
 });
 
 // store online users
