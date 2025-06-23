@@ -17,20 +17,23 @@ const app = express();
 const server = http.createServer(app);
 
 // initialize socket.io server
+const whitelistedOrigins = ["http://localhost:5173", process.env.FRONTEND_URL!];
+
 export const io = new Server(server, {
   cors: {
-    origin:
-      process.env.NODE_ENV !== "development"
-        ? process.env.FRONTEND_URL
-        : "http://localhost:5173",
+    origin: (origin, callback) => {
+      if (!origin || whitelistedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Socket.IO CORS not allowed"));
+      }
+    },
     credentials: true,
   },
 });
 
 // store online users
-export const userSocketmap: Record<string, string> = {
-  // {userId: socketId}
-};
+export const userSocketmap: Record<string, string> = {}; // {userId: socketId}
 
 // socket.io connection handler
 io.on("connection", (socket) => {
@@ -53,12 +56,10 @@ io.on("connection", (socket) => {
 });
 
 // middleware setup
-
-const allowedOrigins = ["http://localhost:5173", process.env.FRONTEND_URL];
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || whitelistedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
