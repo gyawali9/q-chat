@@ -6,15 +6,20 @@ import { defineConfig } from "eslint/config";
 
 export default defineConfig({
   ignores: ["dist/**", "node_modules/**"],
-  overrides: [
-    {
-      files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
-      plugins: { js, "@typescript-eslint": tsPlugin },
-      extends: ["js/recommended", "plugin:@typescript-eslint/recommended"],
-      parser: tsParser,
-      languageOptions: {
-        globals: globals.browser,
-      },
-    },
-  ],
+
+  files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
+
+  languageOptions: {
+    parser: tsParser,
+    globals: globals.node, // or globals.browser based on your env
+  },
+
+  plugins: {
+    "@typescript-eslint": tsPlugin,
+  },
+
+  rules: {
+    ...js.configs.recommended.rules,
+    ...tsPlugin.configs.recommended.rules,
+  },
 });
