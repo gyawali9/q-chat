@@ -56,6 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         toast.success(data.message ?? "Login successful");
       } else {
         toast.error(data.message ?? "Login failed");
+        throw new Error(data.message ?? "Login failed"); // ⬅️ Add this
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -65,9 +66,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } else {
           toast.error(apiError?.message || "Unexpected error occurred.");
         }
+        throw error;
       } else {
         // Non-Axios errors (e.g. network, syntax)
         toast.error("Something went wrong.");
+        throw error;
       }
     }
   };

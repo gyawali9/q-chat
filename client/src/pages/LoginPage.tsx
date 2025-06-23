@@ -1,6 +1,5 @@
 import { useContext, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 
 import assets from "../assets/assets";
 import { AuthContext } from "../context/AuthContext";
@@ -59,8 +58,7 @@ const LoginPage = () => {
         navigate("/");
       }
     } catch (error) {
-      console.log(error, "loginhandle error");
-      toast.error("Something went wrong. Please try again.");
+      console.error("Login/signup failed:", error);
     } finally {
       setLoading(false);
     }
