@@ -23,10 +23,20 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Update npm
+      - name: Update npm to latest
         run: npm install -g npm@latest
 
       # Backend
+      - name: Clean old files (Backend)
+        working-directory: ./server
+        run: |
+          rm -rf node_modules package-lock.json
+
+      - name: Show picomatch entries in lockfile (Backend)
+        working-directory: ./server
+        run: |
+          grep picomatch package-lock.json || echo "picomatch not found"
+
       - name: Install Backend Dependencies
         working-directory: ./server
         run: npm ci
@@ -38,6 +48,11 @@ jobs:
           npm run test
 
       # Frontend
+      - name: Clean old files (Frontend)
+        working-directory: ./client
+        run: |
+          rm -rf node_modules package-lock.json
+
       - name: Install Frontend Dependencies
         working-directory: ./client
         run: npm ci
