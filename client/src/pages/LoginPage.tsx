@@ -60,14 +60,24 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cover bg-center flex items-center justify-center gap-8 sm:justify-evenly max-sm:flex-col backdrop-blur-2xl">
+    <div className="min-h-screen bg-cover bg-center flex items-center justify-center gap-8 md:justify-evenly max-md:flex-col backdrop-blur-2xl">
       {/* left */}
-      <img src={assets.logo_big} alt="logo" className="w-[min(30vw, 250px)]" />
+      <img
+        src={assets.logo_big}
+        alt="logo"
+        className="
+          h-auto
+          w-[30vw]
+          md:w-[30vw]
+          lg:w-[min(30vw, 250px)
+          object-contain
+        "
+      />
 
       {/* right */}
       <form
         onSubmit={onSubmitHandler}
-        className="border-2 bg-white/8 text-white border-gray-500 p-6 flex flex-col gap-6 rounded-lg shadow-lg"
+        className="border-2 bg-white/8 text-white border-gray-500 p-6 flex flex-col gap-6 rounded-lg shadow-lg max-w-md w-full"
       >
         <h2 className="font-medium text-2xl flex justify-between items-center">
           {currentState}
@@ -139,6 +149,9 @@ const LoginPage = () => {
                 onClick={() => {
                   setCurrentState("Login");
                   setIsDataSubmitted(false);
+                  setFullName("");
+                  setEmail("");
+                  setPassword("");
                 }}
                 className="font-medium text-violet-500 cursor-pointer"
               >
@@ -151,6 +164,8 @@ const LoginPage = () => {
               <span
                 onClick={() => {
                   setCurrentState("Sign up");
+                  setEmail("");
+                  setPassword("");
                 }}
                 className="font-medium text-violet-500 cursor-pointer"
               >
