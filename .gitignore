@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Node.js (accidental root-level)
+node_modules/
+npm-debug.log*
+
+# Environment files
+.env
+.env.*   # in case shared ones exist at root
+
+# Logs
+logs/
+*.log
+
+# Editor settings
+.vscode/
+.idea/
+*.swp
