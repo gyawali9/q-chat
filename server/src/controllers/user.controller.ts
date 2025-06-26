@@ -16,7 +16,7 @@ interface ProfileUpdateFields {
 //  Utility: create both tokens
 const createTokens = (userId: string) => {
   const accessToken = jwt.sign({ userId }, process.env.JWT_SECRET!, {
-    expiresIn: "1m",
+    expiresIn: "30m",
   });
 
   const refreshToken = jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET!, {
