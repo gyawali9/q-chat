@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { io, Socket } from "socket.io-client";
+import { io, type Socket } from "socket.io-client";
 
 export const useSocket = (
   userId?: string,
@@ -27,7 +27,7 @@ export const useSocket = (
         socketRef.current = null;
       };
     }
-  }, [userId, setOnlineUser]);
+  }, [userId, setOnlineUser, backend_url]);
 
   return socketRef.current;
 };
