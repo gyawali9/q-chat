@@ -1,5 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-
+import React, {
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type UIEvent,
+} from "react";
 import assets from "../../../assets/assets";
 import { formatMessageTime } from "../../../utility";
 import { ChatContext } from "../../../context/ChatContext";
@@ -12,16 +17,12 @@ const ChatContainer = () => {
   const { authUser, onlineUser } = useContext(AuthContext)!;
 
   const [input, setInput] = useState("");
+  const [isScrolledUp, setIsScrolledUp] = useState(false);
+  const [newMessagesCount, setNewMessagesCount] = useState(0);
 
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const scrollEnd = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (scrollEnd.current && messages) {
-      scrollEnd.current?.scrollIntoView({
-        behavior: "smooth",
-      });
-    }
-  }, [messages]);
+  const prevMessagesLength = useRef<number>(0);
 
   useEffect(() => {
     if (selectedUser) {
@@ -29,26 +30,52 @@ const ChatContainer = () => {
     }
   }, [selectedUser, getMessages]);
 
-  // handle sending a message
+  useEffect(() => {
+    const newMessageDelta = messages.length - prevMessagesLength.current;
+
+    if (!isScrolledUp) {
+      scrollEnd.current?.scrollIntoView({ behavior: "smooth" });
+      setNewMessagesCount(0);
+    } else if (newMessageDelta > 0) {
+      setNewMessagesCount((prev) => prev + newMessageDelta);
+    }
+
+    prevMessagesLength.current = messages.length;
+  }, [messages]);
+
+  const handleScroll = (e: UIEvent<HTMLDivElement>) => {
+    const element = e.currentTarget;
+    const threshold = 120;
+    const isAtBottom =
+      element.scrollHeight - element.scrollTop - element.clientHeight <
+      threshold;
+
+    setIsScrolledUp(!isAtBottom);
+
+    if (isAtBottom) {
+      setNewMessagesCount(0);
+    }
+  };
+
+  const scrollToBottom = () => {
+    scrollEnd.current?.scrollIntoView({ behavior: "smooth" });
+    setNewMessagesCount(0);
+    setIsScrolledUp(false);
+  };
+
   const handleSendMessage = async (
     e:
       | React.KeyboardEvent<HTMLInputElement>
       | React.MouseEvent<HTMLImageElement>
   ) => {
     e.preventDefault();
-
-    // If it's a key press, only continue if Enter was pressed
     if ("key" in e && e.key !== "Enter") return;
-
     if (input.trim() === "") return;
 
-    // await sendMessage({ content: { text: input.trim() } });
-    await sendMessage({ text: input.trim() }); // ✅ works
-
+    await sendMessage({ text: input.trim() });
     setInput("");
   };
 
-  // handle sending image
   const handleSendImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !file.type.startsWith("image/")) {
@@ -64,9 +91,17 @@ const ChatContainer = () => {
     reader.readAsDataURL(file);
   };
 
+  const formatMessageLabel = () => {
+    if (newMessagesCount === 1) return "↓ 1 message";
+    if (newMessagesCount >= 2 && newMessagesCount <= 4)
+      return `↓ +${newMessagesCount - 1} message`;
+    if (newMessagesCount > 4) return "↓ +4 messages";
+    return "";
+  };
+
   return selectedUser ? (
-    <div className="h-full overflow-scroll relative backdrop-blur-lg">
-      {/* header */}
+    <div className="h-full overflow-hidden relative backdrop-blur-lg">
+      {/* Header */}
       <div className="flex items-center gap-3 py-3 mx-4 border-b border-stone-500">
         <img
           src={selectedUser.profilePic || assets.avatar_icon}
@@ -92,8 +127,12 @@ const ChatContainer = () => {
         />
       </div>
 
-      {/* chat area */}
-      <div className="flex flex-col h-[calc(100%-120px)] overflow-y-scroll p-3 pb-6">
+      {/* Chat Area */}
+      <div
+        className="flex flex-col h-[calc(100%-120px)] overflow-y-scroll p-3 pb-6"
+        onScroll={handleScroll}
+        ref={scrollContainerRef}
+      >
         {messages.map((msg) => (
           <div
             key={msg._id}
@@ -137,7 +176,17 @@ const ChatContainer = () => {
         <div ref={scrollEnd}></div>
       </div>
 
-      {/* bottom area */}
+      {/* Scroll-to-bottom Indicator */}
+      {newMessagesCount > 0 && (
+        <button
+          onClick={scrollToBottom}
+          className="absolute bottom-[80px] left-1/2 transform -translate-x-1/2 bg-violet-600 text-white px-3 py-1 text-sm rounded-full shadow-md animate-bounce truncate max-w-[200px]"
+        >
+          {formatMessageLabel()}
+        </button>
+      )}
+
+      {/* Bottom Input */}
       <div className="absolute bottom-0 left-0 right-0 flex items-center gap-3 p-3">
         <div className="flex-1 flex items-center bg-gray-100/12 px-3 rounded-full">
           <input
@@ -146,8 +195,7 @@ const ChatContainer = () => {
             onKeyDown={(e) => (e.key === "Enter" ? handleSendMessage(e) : null)}
             type="text"
             placeholder="Send a message"
-            className="flex-1 text-sm p-3 border-none rounded-lg outline-none text-white placeholder-gray-400
-           "
+            className="flex-1 text-sm p-3 border-none rounded-lg outline-none text-white placeholder-gray-400"
           />
           <input
             onChange={handleSendImage}
